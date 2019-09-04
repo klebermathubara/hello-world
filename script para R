@@ -1,0 +1,82 @@
+#Meristic and Morphometric data of Erythrinus
+#Abaixo segue o script abaixo descrevem os processos para cada passo das análises dos dados
+#   Algumas dos exemplos realizados aqui são expressos apenas para uma variável "CPA", mas podem ser realizados para todas as outras medidas
+          #1)Carregar o arquivo
+          #   No painel de ferramentas use:
+          #     session=> set working directory => choose directory
+          #       em seguida:
+mtp<-read.csv("erythrinusMTP.csv", header = T)
+View(mtp)
+
+          #2)Sumarizar o dataframe e a estrutura dos dados 
+          #   o mais importante é identificar se os dados estão expressos em:
+          #     numeric; factor; characters
+summary(mtp)
+str(mtp)
+
+          #     caso os dados não estejam em "numeric"
+          #       não será possível gerar estatísticas ou gráficos
+          
+          #     Para converter primeiro teremos de substituir "," por "." em decimais
+mtp$CPA<-gsub(",",".",mtp$CPA)
+View(mtp)
+
+mtp$CAN<-gsub(",",".",mtp$CAN)
+View(mtp)
+
+          #     Feito isso podemos iniciar o processo de transformação dos dados
+
+mtp$CPA <-as.numeric(mtp$CPA)
+is.numeric(mtp$CPA)
+
+mtp$CAN <-as.numeric(mtp$CAN)
+is.numeric(mtp$CAN)
+
+          #     confirmada a transformação dos dados repita o procedimento para as demais colunas
+
+
+
+          #3)Para iniciar a seleção dos dados para análise dos dados (subsets)
+          #   Deve-se tomar o seguinte comando onde: [linha,coluna]
+          #     Exemplo: iremos criar subset "cpa", com apenas a coluna 7 de "mtp"
+cpa<-mtp[,7]
+View(cpa)
+
+          #   Para separar apenas um conjunto de dados de um subset
+          #     a partir deste comando é possível selecionar as observações de apenas uma categoria 
+          #       (importante ressaltar que ela tem que ser um "factor")
+
+t1<-subset(mtp,TIPO==1)
+View(t1)
+
+
+          #   Certos casos é necessário extrair alguns dados apenas do dataset
+          #   Nestes casos podemos utilizar a função "c"
+          #     Exemplo: iremos criar um subset "cpa1", com apenas os dados entre parênteses
+cpa1<-c(464,111,399,138)
+View(cpa1)
+
+          #Em uma abordagem inicial podemos explorar alguns gráficos de cada variável
+          #   Para isso é necessário carregar a biblioteca:
+library(ggplot2)
+
+          #Em seguida começar a gerar os primeiros gráficos os valores brutos das observações
+            #Em primeiro gráfico gerado é simples e com quadriculados, sem 
+ggplot2(t1,aes(CPA,CAN))+geom_point()
+
+ggplot(mtp,aes(CPA,CAN,colour=ESPECIE))+geom_point()+
+  labs(x="Comprimento padrão",y="Comprimento da anal",colour = "# Espécies")
+
+ggplot(mtp,aes(CPA,CAN,colour=DRENAGEM))+geom_point()+labs(x="Comprimento padrão",y="Comprimento da anal",colour = "# Drenagem")
+
+
+ggplot(t1,aes(CPA,CDO,colour=DRENAGEM))+geom_point()+labs(x="Comprimento padrão",y="Comprimento da dorsal",colour = "# DRENAGEM")+
+  geom_smooth(se = FALSE, method = lm)+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour="black"))
+
+        #Histograma de frequência de distribuição
+        #exemplo com escamas da linha lateral "ELL"
+qplot(t1$ELL,geom = "histogram")
